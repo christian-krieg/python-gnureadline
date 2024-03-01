@@ -73,13 +73,12 @@ if building and not os.path.exists('readline/libreadline.a'):
     shell_path = which_shell()
     if verbose:
         print("\n============ Building the readline library ============\n")
-        os.system('cd rl && %s ./build.sh' % shell_path)
+        os.system('cd ncurses && %s ./build-ncurses.sh' % shell_path)
+        os.system('cd rl && %s ./build-readline.sh' % shell_path)
         print("\n============ Building the readline extension module ============\n")
     else:
-        os.system('cd rl && %s ./build.sh > /dev/null 2>&1' % shell_path)
-    # Add symlink that simplifies include and link paths to real library
-    if not (os.path.exists('readline') or os.path.islink('readline')):
-        os.symlink(os.path.join('rl', 'readline-lib'), 'readline')
+        os.system('cd ncurses && %s ./build-ncurses.sh > /dev/null 2>&1' % shell_path)
+        os.system('cd rl && %s ./build-readline.sh > /dev/null 2>&1' % shell_path)
 
 
 # Workaround for OS X 10.9.2 and Xcode 5.1+
@@ -127,9 +126,12 @@ setup(
                   sources=[source],
                   include_dirs=['.', os.path.dirname(source)],
                   define_macros=DEFINE_MACROS,
-                  extra_objects=['readline/libreadline.a', 'readline/libhistory.a'],
-                  libraries=['ncurses']
-                  ),
+                  extra_objects=[
+                      'deps/lib/libreadline.a',
+                      'deps/lib/libhistory.a',
+                      'deps/lib/libncursesw.a',
+                  ],
+        ),
     ],
     zip_safe=False,
 )
